@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/product.dart';
+import '../providers/cart.dart';
 
 import '../screens/product_detail_screen.dart';
 
 class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final product = Provider.of<Product>(context, listen: false);
+    final productData = Provider.of<Product>(context, listen: false);
+    final cartData = Provider.of<Cart>(context, listen: false);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -16,17 +18,17 @@ class ProductItem extends StatelessWidget {
         child: GestureDetector(
           onTap: () => Navigator.of(context).pushNamed(
             ProductDetailScreen.routeName,
-            arguments: product.id,
+            arguments: productData.id,
           ),
           child: Image.network(
-            product.imageUrl,
+            productData.imageUrl,
             fit: BoxFit.cover,
           ),
         ),
         footer: GridTileBar(
           backgroundColor: Colors.black87,
           leading: Consumer<Product>(
-            builder: (context, value, _) => IconButton(
+            builder: (context, product, _) => IconButton(
               icon: Icon(
                   product.isFavorite ? Icons.favorite : Icons.favorite_border),
               onPressed: product.toogleFavoriteStatus,
@@ -34,12 +36,16 @@ class ProductItem extends StatelessWidget {
             ),
           ),
           title: Text(
-            product.title,
+            productData.title,
             textAlign: TextAlign.center,
           ),
           trailing: IconButton(
             icon: Icon(Icons.shopping_cart),
-            onPressed: () {},
+            onPressed: () => cartData.addItem(
+              productId: productData.id,
+              title: productData.title,
+              price: productData.price,
+            ),
             color: Theme.of(context).accentColor,
           ),
         ),
