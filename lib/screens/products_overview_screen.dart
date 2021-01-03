@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_shop/widgets/badge.dart';
 
 import '../widgets/products_grid.dart';
 
@@ -42,6 +43,13 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                 }
               });
             },
+          ),
+          Badge(
+            child: IconButton(
+              icon: Icon(Icons.shopping_cart),
+              onPressed: () {},
+            ),
+            value: '0',
           )
         ],
       ),
