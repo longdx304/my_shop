@@ -17,11 +17,15 @@ class CartItem {
 class Cart with ChangeNotifier {
   Map<String, CartItem> _items = {};
 
+  double get totalAmount {
+    var amount = 0.0;
+    _items.forEach((key, item) => amount += item.price * item.quantity);
+    return amount;
+  }
+
   int get quantityCount {
     var quantity = 0;
-    _items.forEach((key, item) {
-      quantity += item.quantity;
-    });
+    _items.forEach((key, item) => quantity += item.quantity);
     return quantity;
   }
 
