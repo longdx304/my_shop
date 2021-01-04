@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:my_shop/providers/cart.dart';
 import 'package:provider/provider.dart';
+
+import '../providers/cart.dart' show Cart;
+
+import '../widgets/cart_item.dart';
 
 class CartScreen extends StatelessWidget {
   static const routeName = '/cart';
@@ -11,38 +14,52 @@ class CartScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Your Cart'),
       ),
-      body: Card(
-        margin: EdgeInsets.all(15),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Text(
-                'Total',
-                style: TextStyle(
-                  fontSize: 20,
+      body: Consumer<Cart>(
+        builder: (context, cartItem, child) => Column(
+          children: [
+            Card(
+              margin: EdgeInsets.all(15),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(
+                      'Total',
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                    Spacer(),
+                    Chip(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      label: Text(
+                        '\$${cartItem.totalAmount}',
+                        style: Theme.of(context).primaryTextTheme.headline6,
+                      ),
+                    ),
+                    FlatButton(
+                      onPressed: () {},
+                      child: Text(
+                        'ORDER NOW',
+                      ),
+                      textColor: Theme.of(context).primaryColor,
+                    ),
+                  ],
                 ),
               ),
-              Spacer(),
-              Consumer<Cart>(
-                builder: (context, cartItem, child) => Chip(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  label: Text(
-                    '\$${cartItem.totalAmount}',
-                    style: Theme.of(context).primaryTextTheme.headline6,
-                  ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: cartItem.items.length,
+                itemBuilder: (context, index) => CartItem(
+                  quantity: cartItem.items.values.toList()[index].quantity,
+                  price: cartItem.items.values.toList()[index].price,
+                  title: cartItem.items.values.toList()[index].title,
                 ),
               ),
-              FlatButton(
-                onPressed: () {},
-                child: Text(
-                  'ORDER NOW',
-                ),
-                textColor: Theme.of(context).primaryColor,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
