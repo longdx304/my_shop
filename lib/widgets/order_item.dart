@@ -13,7 +13,7 @@ class OrderItem extends StatelessWidget {
     return Card(
       margin: EdgeInsets.all(10),
       child: ListTile(
-        title: Text('\$${order.amount}'),
+        title: Text('\$${order.amount.toStringAsFixed(2)}'),
         subtitle: Text(
           DateFormat('dd/MM/yyyy hh:mm').format(order.dateTime),
         ),
