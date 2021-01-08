@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/products.dart';
+import '../providers/product.dart';
 
 class EditedProduct {
   String title;
@@ -61,10 +65,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
     final isValid = _formKey.currentState.validate();
     if (!isValid) return;
     _formKey.currentState.save();
-    print(_editedProduct.title);
-    print(_editedProduct.price);
-    print(_editedProduct.description);
-    print(_editedProduct.imageUrl);
+    final _product = Product(
+      id: null,
+      title: _editedProduct.title,
+      description: _editedProduct.description,
+      price: _editedProduct.price,
+      imageUrl: _editedProduct.imageUrl,
+    );
+    Provider.of<Products>(context, listen: false).addProduct(_product);
   }
 
   @override
