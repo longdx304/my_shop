@@ -73,6 +73,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       imageUrl: _editedProduct.imageUrl,
     );
     Provider.of<Products>(context, listen: false).addProduct(_product);
+    Navigator.of(context).pop();
   }
 
   @override
