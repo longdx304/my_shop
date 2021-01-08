@@ -36,6 +36,8 @@ class UserProductsScreen extends StatelessWidget {
                   id: productsData.items[index].id,
                   imageUrl: productsData.items[index].imageUrl,
                   title: productsData.items[index].title,
+                  deleteHandler: () =>
+                      productsData.deleteProduct(productsData.items[index].id),
                 ),
                 Divider(),
               ],
