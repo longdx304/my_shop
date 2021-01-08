@@ -47,10 +47,19 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void _updateImageUrl() {
-    if (!_imageUrlFocusNode.hasFocus) setState(() {});
+    if (!_imageUrlFocusNode.hasFocus) {
+      if ((!_imageUrlController.text.startsWith('http://') &&
+              !_imageUrlController.text.startsWith('https://')) ||
+          (!_imageUrlController.text.endsWith('.png') &&
+              !_imageUrlController.text.endsWith('.jpg') &&
+              !_imageUrlController.text.endsWith('jpeg'))) return;
+      setState(() {});
+    }
   }
 
   void _saveForm() {
+    final isValid = _formKey.currentState.validate();
+    if (!isValid) return;
     _formKey.currentState.save();
     print(_editedProduct.title);
     print(_editedProduct.price);
@@ -73,6 +82,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
+          autovalidateMode: AutovalidateMode.always,
           key: _formKey,
           child: SingleChildScrollView(
             child: Column(
@@ -80,21 +90,38 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 TextFormField(
                   decoration: InputDecoration(labelText: 'Title'),
                   textInputAction: TextInputAction.next,
-                  onSaved: (title) => _editedProduct.title = title,
+                  validator: (editedTitle) {
+                    if (editedTitle.isEmpty) return 'Please provide a title';
+                    return null;
+                  },
+                  onSaved: (editedTitle) => _editedProduct.title = editedTitle,
                 ),
                 TextFormField(
                   decoration: InputDecoration(labelText: 'Price'),
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.number,
-                  onSaved: (price) =>
-                      _editedProduct.price = double.parse(price),
+                  validator: (editedPrice) {
+                    if (editedPrice.isEmpty) return 'Please enter a price';
+                    if (double.tryParse(editedPrice) == null)
+                      return 'Please enter a valid number';
+                    if (double.parse(editedPrice) <= 0)
+                      return 'Please enter a number greater than 0';
+                    return null;
+                  },
+                  onSaved: (editedPrice) =>
+                      _editedProduct.price = double.parse(editedPrice),
                 ),
                 TextFormField(
                   decoration: InputDecoration(labelText: 'Description'),
                   maxLines: 3,
                   keyboardType: TextInputType.multiline,
-                  onSaved: (description) =>
-                      _editedProduct.description = description,
+                  validator: (editedDescription) {
+                    if (editedDescription.isEmpty)
+                      return 'Please enter a description';
+                    return null;
+                  },
+                  onSaved: (editedDescription) =>
+                      _editedProduct.description = editedDescription,
                 ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -128,9 +155,20 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         textInputAction: TextInputAction.done,
                         controller: _imageUrlController,
                         focusNode: _imageUrlFocusNode,
+                        validator: (editedImageUrl) {
+                          if (editedImageUrl.isEmpty)
+                            return 'Please enter an image Url';
+                          if ((!editedImageUrl.startsWith('http://') &&
+                                  !editedImageUrl.startsWith('https://')) ||
+                              (!editedImageUrl.endsWith('.png') &&
+                                  !editedImageUrl.endsWith('.jpg') &&
+                                  !editedImageUrl.endsWith('jpeg')))
+                            return 'Please enter a valid Url';
+                          return null;
+                        },
                         onFieldSubmitted: (value) => _saveForm(),
-                        onSaved: (imageUrl) =>
-                            _editedProduct.imageUrl = imageUrl,
+                        onSaved: (editedImageUrl) =>
+                            _editedProduct.imageUrl = editedImageUrl,
                       ),
                     ),
                   ],
