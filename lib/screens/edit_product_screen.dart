@@ -7,14 +7,18 @@ import '../providers/product.dart';
 class EditedProduct {
   String title;
   String description;
-  double price;
+  String price;
   String imageUrl;
+  String id;
+  bool isFavorite;
 
   EditedProduct({
     this.title,
     this.description,
     this.price,
     this.imageUrl,
+    this.id,
+    this.isFavorite,
   });
 }
 
@@ -26,20 +30,46 @@ class EditProductScreen extends StatefulWidget {
 }
 
 class _EditProductScreenState extends State<EditProductScreen> {
+  var _isInit = true;
   final _imageUrlController = TextEditingController();
   final _imageUrlFocusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
   var _editedProduct = EditedProduct(
+    id: null,
     title: '',
-    price: 0.0,
+    price: '',
     description: '',
     imageUrl: '',
+    isFavorite: false,
   );
 
   @override
   void initState() {
     _imageUrlFocusNode.addListener(_updateImageUrl);
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      final productId = ModalRoute.of(context).settings.arguments;
+      if (productId != null) {
+        final editingProduct =
+            Provider.of<Products>(context).findById(productId);
+        _editedProduct = EditedProduct(
+          id: editingProduct.id,
+          title: editingProduct.title,
+          price: editingProduct.price.toString(),
+          description: editingProduct.description,
+          imageUrl: editingProduct.imageUrl,
+          isFavorite: editingProduct.isFavorite,
+        );
+        _imageUrlController.text = editingProduct.imageUrl;
+      }
+    }
+    _isInit = false;
+
+    super.didChangeDependencies();
   }
 
   @override
@@ -66,13 +96,20 @@ class _EditProductScreenState extends State<EditProductScreen> {
     if (!isValid) return;
     _formKey.currentState.save();
     final _product = Product(
-      id: null,
+      id: _editedProduct.id,
       title: _editedProduct.title,
       description: _editedProduct.description,
-      price: _editedProduct.price,
+      price: double.parse(_editedProduct.price),
       imageUrl: _editedProduct.imageUrl,
+      isFavorite: _editedProduct.isFavorite,
     );
-    Provider.of<Products>(context, listen: false).addProduct(_product);
+    if (_editedProduct.id == null) {
+      Provider.of<Products>(context, listen: false).addProduct(_product);
+    } else {
+      Provider.of<Products>(context, listen: false)
+          .updateProduct(_editedProduct.id, _product);
+    }
+
     Navigator.of(context).pop();
   }
 
@@ -80,7 +117,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Product'),
+        title: Text(_editedProduct.id == null ? 'Add Product' : 'Edit Product'),
         actions: [
           IconButton(
             icon: Icon(Icons.save),
@@ -97,6 +134,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             child: Column(
               children: [
                 TextFormField(
+                  initialValue: _editedProduct.title,
                   decoration: InputDecoration(labelText: 'Title'),
                   textInputAction: TextInputAction.next,
                   validator: (editedTitle) {
@@ -106,6 +144,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   onSaved: (editedTitle) => _editedProduct.title = editedTitle,
                 ),
                 TextFormField(
+                  initialValue: _editedProduct.price,
                   decoration: InputDecoration(labelText: 'Price'),
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.number,
@@ -117,10 +156,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       return 'Please enter a number greater than 0';
                     return null;
                   },
-                  onSaved: (editedPrice) =>
-                      _editedProduct.price = double.parse(editedPrice),
+                  onSaved: (editedPrice) => _editedProduct.price = editedPrice,
                 ),
                 TextFormField(
+                  initialValue: _editedProduct.description,
                   decoration: InputDecoration(labelText: 'Description'),
                   maxLines: 3,
                   keyboardType: TextInputType.multiline,
