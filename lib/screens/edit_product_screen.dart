@@ -92,7 +92,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
-  void _saveForm() {
+  Future<void> _saveForm() async {
     final isValid = _formKey.currentState.validate();
     if (!isValid) return;
     _formKey.currentState.save();
@@ -106,25 +106,27 @@ class _EditProductScreenState extends State<EditProductScreen> {
       isFavorite: _editedProduct.isFavorite,
     );
     if (_editedProduct.id == null) {
-      Provider.of<Products>(context, listen: false)
-          .addProduct(_product)
-          .catchError((error) => showDialog<Null>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text('An error occurred!'),
-                  content: Text('Something went wrong'),
-                  actions: [
-                    FlatButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text('Okay'),
-                    ),
-                  ],
-                ),
-              ))
-          .then((_) {
+      try {
+        await Provider.of<Products>(context, listen: false)
+            .addProduct(_product);
+      } catch (error) {
+        await showDialog<Null>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('An error occurred!'),
+            content: Text('Something went wrong'),
+            actions: [
+              FlatButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('Okay'),
+              ),
+            ],
+          ),
+        );
+      } finally {
         setState(() => _isLoading = false);
         Navigator.of(context).pop();
-      });
+      }
     } else {
       Provider.of<Products>(context, listen: false)
           .updateProduct(_editedProduct.id, _product);
