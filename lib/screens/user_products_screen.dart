@@ -38,8 +38,18 @@ class UserProductsScreen extends StatelessWidget {
                     id: productsData.items[index].id,
                     imageUrl: productsData.items[index].imageUrl,
                     title: productsData.items[index].title,
-                    deleteHandler: () => productsData
-                        .deleteProduct(productsData.items[index].id),
+                    deleteHandler: () async {
+                      try {
+                        await productsData
+                            .deleteProduct(productsData.items[index].id);
+                      } catch (error) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                          'Deleting failed!',
+                          textAlign: TextAlign.center,
+                        )));
+                      }
+                    },
                   ),
                   Divider(),
                 ],
