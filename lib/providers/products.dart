@@ -6,8 +6,10 @@ import 'package:http/http.dart' as http;
 import 'product.dart';
 
 class Products with ChangeNotifier {
+  static const _url =
+      'https://my-shop-8e0fa-default-rtdb.firebaseio.com/products.json';
   List<Product> _items = [
-    Product(
+    /* Product(
       id: 'p1',
       title: 'Red Shirt',
       description: 'A red shirt - it is pretty red!',
@@ -38,7 +40,7 @@ class Products with ChangeNotifier {
       price: 49.99,
       imageUrl:
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ),
+    ), */
   ];
 
   List<Product> get favoriteItems {
@@ -53,12 +55,28 @@ class Products with ChangeNotifier {
     return _items.firstWhere((item) => item.id == id);
   }
 
+  Future<void> fetchAndSetProducts() async {
+    try {
+      final res = await http.get(_url);
+      final Map<String, dynamic> products = json.decode(res.body);
+      products.forEach((productId, product) => _items.add(Product(
+            id: productId,
+            description: product['title'],
+            imageUrl: product['imageUrl'],
+            price: product['price'],
+            title: product['title'],
+            isFavorite: product['isFavorite'],
+          )));
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
+  }
+
   Future<void> addProduct(Product product) async {
-    const url =
-        'https://my-shop-8e0fa-default-rtdb.firebaseio.com/products.json';
     try {
       final res = await http.post(
-        url,
+        _url,
         body: json.encode({
           'title': product.title,
           'description': product.description,
