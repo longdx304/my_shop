@@ -31,7 +31,18 @@ class ProductItem extends StatelessWidget {
             builder: (context, product, _) => IconButton(
               icon: Icon(
                   product.isFavorite ? Icons.favorite : Icons.favorite_border),
-              onPressed: product.toogleFavoriteStatus,
+              onPressed: () async {
+                try {
+                  await product.toogleFavoriteStatus();
+                } catch (error) {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                    'Failed to mark as favorite!',
+                    textAlign: TextAlign.center,
+                  )));
+                }
+              },
               color: Theme.of(context).accentColor,
             ),
           ),
