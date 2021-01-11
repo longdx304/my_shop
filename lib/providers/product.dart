@@ -28,12 +28,12 @@ class Product with ChangeNotifier {
     throw HttpException('Could not mark product as favorite.');
   }
 
-  Future<void> toogleFavoriteStatus() async {
+  Future<void> toogleFavoriteStatus(String authToken) async {
     var existingFav = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
     final url =
-        'https://my-shop-8e0fa-default-rtdb.firebaseio.com/products/$id.json';
+        'https://my-shop-8e0fa-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken';
     try {
       final res = await http.patch(url,
           body: json.encode({

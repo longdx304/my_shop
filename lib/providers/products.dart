@@ -8,40 +8,11 @@ import '../models/http_exception.dart';
 import 'product.dart';
 
 class Products with ChangeNotifier {
-  List<Product> _items = [
-    /* Product(
-      id: 'p1',
-      title: 'Red Shirt',
-      description: 'A red shirt - it is pretty red!',
-      price: 29.99,
-      imageUrl:
-          'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-    ),
-    Product(
-      id: 'p2',
-      title: 'Trousers',
-      description: 'A nice pair of trousers.',
-      price: 59.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
-    ),
-    Product(
-      id: 'p3',
-      title: 'Yellow Scarf',
-      description: 'Warm and cozy - exactly what you need for the winter.',
-      price: 19.99,
-      imageUrl:
-          'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
-    ),
-    Product(
-      id: 'p4',
-      title: 'A Pan',
-      description: 'Prepare any meal you want.',
-      price: 49.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ), */
-  ];
+  List<Product> _items = [];
+
+  final String authToken;
+
+  Products(this.authToken, this._items);
 
   List<Product> get favoriteItems {
     return _items.where((item) => item.isFavorite == true).toList();
@@ -57,8 +28,8 @@ class Products with ChangeNotifier {
 
   Future<void> fetchAndSetProducts() async {
     try {
-      const url =
-          'https://my-shop-8e0fa-default-rtdb.firebaseio.com/products.json';
+      final url =
+          'https://my-shop-8e0fa-default-rtdb.firebaseio.com/products.json?auth=$authToken';
       final res = await http.get(url);
       final Map<String, dynamic> products = json.decode(res.body);
       final List<Product> loadedProduct = [];
@@ -80,8 +51,8 @@ class Products with ChangeNotifier {
 
   Future<void> addProduct(Product product) async {
     try {
-      const url =
-          'https://my-shop-8e0fa-default-rtdb.firebaseio.com/products.json';
+      final url =
+          'https://my-shop-8e0fa-default-rtdb.firebaseio.com/products.json?auth=$authToken';
       final res = await http.post(
         url,
         body: json.encode({
@@ -112,7 +83,7 @@ class Products with ChangeNotifier {
     final itemIndex = _items.indexWhere((item) => item.id == id);
     if (itemIndex >= 0) {
       final url =
-          'https://my-shop-8e0fa-default-rtdb.firebaseio.com/products/$id.json';
+          'https://my-shop-8e0fa-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken';
       await http.patch(url,
           body: json.encode({
             'title': product.title,
@@ -129,7 +100,7 @@ class Products with ChangeNotifier {
 
   Future<void> deleteProduct(String id) async {
     final url =
-        'https://my-shop-8e0fa-default-rtdb.firebaseio.com/products/$id.json';
+        'https://my-shop-8e0fa-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken';
     final itemIndex = _items.indexWhere((item) => item.id == id);
     var item = _items[itemIndex];
 
