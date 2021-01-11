@@ -22,15 +22,14 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   var _showFavoritesOnly = false;
-  var _isLoading = false;
+  Future _productsFuture;
+  Future _obtainProductsFuture() {
+    return Provider.of<Products>(context, listen: false).fetchAndSetProducts();
+  }
 
   @override
   void initState() {
-    setState(() => _isLoading = true);
-    Provider.of<Products>(context, listen: false)
-        .fetchAndSetProducts()
-        .then((_) => setState(() => _isLoading = false));
-
+    _productsFuture = _obtainProductsFuture();
     super.initState();
   }
 
@@ -76,11 +75,23 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: _isLoading
-          ? Center(
+      body: FutureBuilder(
+        future: _productsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
               child: CircularProgressIndicator(),
-            )
-          : ProductsGrid(_showFavoritesOnly),
+            );
+          }
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('An error occured when loading products!'),
+            );
+          } else {
+            return ProductsGrid(_showFavoritesOnly);
+          }
+        },
+      ),
     );
   }
 }

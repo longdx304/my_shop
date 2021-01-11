@@ -14,14 +14,14 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
-  var _isLoading = false;
+  Future _ordersFuture;
+  Future _obtainOrdersFuture() {
+    return Provider.of<Orders>(context, listen: false).fetchAndSetOrders();
+  }
 
   @override
   void initState() {
-    setState(() => _isLoading = true);
-    Provider.of<Orders>(context, listen: false)
-        .fetchAndSetOrders()
-        .then((_) => setState(() => _isLoading = false));
+    _ordersFuture = _obtainOrdersFuture();
     super.initState();
   }
 
@@ -32,18 +32,30 @@ class _OrderScreenState extends State<OrderScreen> {
         title: Text('Your Orders'),
       ),
       drawer: AppDrawer(),
-      body: _isLoading
-          ? Center(
+      body: FutureBuilder(
+        future: _ordersFuture,
+        builder: (context, snapShot) {
+          if (snapShot.connectionState == ConnectionState.waiting) {
+            return Center(
               child: CircularProgressIndicator(),
-            )
-          : Consumer<Orders>(
+            );
+          }
+          if (snapShot.hasError) {
+            return Center(
+              child: Text('An error occured!'),
+            );
+          } else {
+            return Consumer<Orders>(
               builder: (context, ordersData, child) => ListView.builder(
                 itemCount: ordersData.orders.length,
                 itemBuilder: (context, index) => OrderItem(
                   ordersData.orders[index],
                 ),
               ),
-            ),
+            );
+          }
+        },
+      ),
     );
   }
 }
