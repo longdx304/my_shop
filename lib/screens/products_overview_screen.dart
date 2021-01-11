@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:my_shop/providers/cart.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/products.dart';
-
 import 'cart_screen.dart';
 
 import '../widgets/badge.dart';
@@ -22,16 +20,6 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   var _showFavoritesOnly = false;
-  Future _productsFuture;
-  Future _obtainProductsFuture() {
-    return Provider.of<Products>(context, listen: false).fetchAndSetProducts();
-  }
-
-  @override
-  void initState() {
-    _productsFuture = _obtainProductsFuture();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,23 +63,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: FutureBuilder(
-        future: _productsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (snapshot.hasError) {
-            return Center(
-              child: Text('An error occured when loading products!'),
-            );
-          } else {
-            return ProductsGrid(_showFavoritesOnly);
-          }
-        },
-      ),
+      body: ProductsGrid(_showFavoritesOnly),
     );
   }
 }
