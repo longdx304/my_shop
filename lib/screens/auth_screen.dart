@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 
 import '../providers/auth.dart';
 
+import '../models/http_exception.dart';
+
 enum AuthMode { Signup, Login }
 
 class AuthScreen extends StatelessWidget {
@@ -104,6 +106,22 @@ class _AuthCardState extends State<AuthCard> {
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('An Error Occured!'),
+        content: Text(message),
+        actions: [
+          FlatButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Okay'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState.validate()) {
       // Invalid!
@@ -113,17 +131,34 @@ class _AuthCardState extends State<AuthCard> {
     setState(() {
       _isLoading = true;
     });
-    if (_authMode == AuthMode.Login) {
-      await Provider.of<Auth>(context, listen: false).logIn(
-        email: _authData['email'],
-        password: _authData['password'],
-      );
-    } else {
-      await Provider.of<Auth>(context, listen: false).signUp(
-        email: _authData['email'],
-        password: _authData['password'],
-      );
+    try {
+      if (_authMode == AuthMode.Login) {
+        await Provider.of<Auth>(context, listen: false).logIn(
+          email: _authData['email'],
+          password: _authData['password'],
+        );
+      } else {
+        await Provider.of<Auth>(context, listen: false).signUp(
+          email: _authData['email'],
+          password: _authData['password'],
+        );
+      }
+    } on HttpException catch (error) {
+      var errorMessage = 'Authentication failed';
+      if (error.toString().contains('EMAIL_EXISTS'))
+        errorMessage =
+            'The email address is already in use by another account.';
+      else if (error.toString().contains('EMAIL_NOT_FOUND'))
+        errorMessage =
+            'There is no user corresponding with this email address.';
+      else if (error.toString().contains('INVALID_PASSWORD'))
+        errorMessage = 'The password is invalid.';
+      _showErrorDialog(errorMessage);
+    } catch (error) {
+      final errorMessage = 'Authentication failed. Please contact support';
+      _showErrorDialog(errorMessage);
     }
+
     setState(() {
       _isLoading = false;
     });
