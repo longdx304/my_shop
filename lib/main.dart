@@ -36,21 +36,23 @@ class MyApp extends StatelessWidget {
           create: (_) => Orders(),
         )
       ],
-      child: MaterialApp(
-        title: 'My Shop',
-        theme: ThemeData(
-          primarySwatch: Colors.purple,
-          accentColor: Colors.deepOrange,
-          fontFamily: 'Lato',
+      child: Consumer<Auth>(
+        builder: (context, auth, child) => MaterialApp(
+          title: 'My Shop',
+          theme: ThemeData(
+            primarySwatch: Colors.purple,
+            accentColor: Colors.deepOrange,
+            fontFamily: 'Lato',
+          ),
+          home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),
+          routes: {
+            EditProductScreen.routeName: (_) => EditProductScreen(),
+            UserProductsScreen.routeName: (_) => UserProductsScreen(),
+            OrderScreen.routeName: (_) => OrderScreen(),
+            CartScreen.routeName: (_) => CartScreen(),
+            ProductDetailScreen.routeName: (_) => ProductDetailScreen(),
+          },
         ),
-        home: AuthScreen(),
-        routes: {
-          EditProductScreen.routeName: (_) => EditProductScreen(),
-          UserProductsScreen.routeName: (_) => UserProductsScreen(),
-          OrderScreen.routeName: (_) => OrderScreen(),
-          CartScreen.routeName: (_) => CartScreen(),
-          ProductDetailScreen.routeName: (_) => ProductDetailScreen(),
-        },
       ),
     );
   }
