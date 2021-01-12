@@ -65,4 +65,11 @@ class Auth with ChangeNotifier {
     return _authentication(
         email: email, password: password, urlSegment: 'signInWithPassword');
   }
+
+  void logOut() {
+    _token = null;
+    _expireDate = null;
+    _userId = null;
+    notifyListeners();
+  }
 }
