@@ -37,7 +37,7 @@ class Product with ChangeNotifier {
     try {
       final res = await http.put(url,
           body: json.encode(
-            true,
+            isFavorite,
           ));
       if (res.statusCode >= 400) {
         _rollBackFav(existingFav);

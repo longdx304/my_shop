@@ -10,7 +10,6 @@ class EditedProduct {
   String price;
   String imageUrl;
   String id;
-  bool isFavorite;
 
   EditedProduct({
     this.title,
@@ -18,7 +17,6 @@ class EditedProduct {
     this.price,
     this.imageUrl,
     this.id,
-    this.isFavorite,
   });
 }
 
@@ -41,7 +39,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
     price: '',
     description: '',
     imageUrl: '',
-    isFavorite: false,
   );
 
   @override
@@ -63,7 +60,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
           price: editingProduct.price.toString(),
           description: editingProduct.description,
           imageUrl: editingProduct.imageUrl,
-          isFavorite: editingProduct.isFavorite,
         );
         _imageUrlController.text = editingProduct.imageUrl;
       }
@@ -103,7 +99,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
       description: _editedProduct.description,
       price: double.parse(_editedProduct.price),
       imageUrl: _editedProduct.imageUrl,
-      isFavorite: _editedProduct.isFavorite,
     );
     if (_editedProduct.id == null) {
       try {

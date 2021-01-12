@@ -9,10 +9,10 @@ import 'product.dart';
 
 class Products with ChangeNotifier {
   List<Product> _items = [];
-
   final String authToken;
+  final String userId;
 
-  Products(this.authToken, this._items);
+  Products(this.authToken, this.userId, this._items);
 
   List<Product> get favoriteItems {
     return _items.where((item) => item.isFavorite == true).toList();
@@ -28,19 +28,23 @@ class Products with ChangeNotifier {
 
   Future<void> fetchAndSetProducts() async {
     try {
-      final url =
+      var url =
           'https://my-shop-8e0fa-default-rtdb.firebaseio.com/products.json?auth=$authToken';
       final res = await http.get(url);
       final Map<String, dynamic> products = json.decode(res.body);
       final List<Product> loadedProduct = [];
       if (products == null) return;
+      url =
+          'https://my-shop-8e0fa-default-rtdb.firebaseio.com/userFavorites/$userId.json?auth=$authToken';
+      final favRes = await http.get(url);
+      final favData = json.decode(favRes.body);
       products.forEach((productId, product) => loadedProduct.add(Product(
             id: productId,
             description: product['title'],
             imageUrl: product['imageUrl'],
             price: product['price'],
             title: product['title'],
-            isFavorite: product['isFavorite'],
+            isFavorite: favData == null ? false : favData[productId] ?? false,
           )));
       _items = loadedProduct;
       notifyListeners();
@@ -60,7 +64,6 @@ class Products with ChangeNotifier {
           'description': product.description,
           'price': product.price,
           'imageUrl': product.imageUrl,
-          'isFavorite': product.isFavorite,
         }),
       );
       _items.add(
