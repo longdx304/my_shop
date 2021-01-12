@@ -42,7 +42,7 @@ class _OrderScreenState extends State<OrderScreen> {
           }
           if (snapShot.hasError) {
             return Center(
-              child: Text('An error occured!'),
+              child: Text('An error occured while loading your orders!'),
             );
           } else {
             return Consumer<Orders>(

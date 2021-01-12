@@ -47,22 +47,27 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: Consumer<Auth>(
-        builder: (context, auth, child) => MaterialApp(
-          title: 'My Shop',
-          theme: ThemeData(
-            primarySwatch: Colors.purple,
-            accentColor: Colors.deepOrange,
-            fontFamily: 'Lato',
-          ),
-          home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),
-          routes: {
-            EditProductScreen.routeName: (_) => EditProductScreen(),
-            UserProductsScreen.routeName: (_) => UserProductsScreen(),
-            OrderScreen.routeName: (_) => OrderScreen(),
-            CartScreen.routeName: (_) => CartScreen(),
-            ProductDetailScreen.routeName: (_) => ProductDetailScreen(),
-          },
-        ),
+        builder: (context, auth, child) {
+          ifAuth(targetScreen) => auth.isAuth ? targetScreen : AuthScreen();
+
+          return MaterialApp(
+            title: 'My Shop',
+            theme: ThemeData(
+              primarySwatch: Colors.purple,
+              accentColor: Colors.deepOrange,
+              fontFamily: 'Lato',
+            ),
+            home: ifAuth(ProductsOverviewScreen()),
+            routes: {
+              EditProductScreen.routeName: (_) => ifAuth(EditProductScreen()),
+              UserProductsScreen.routeName: (_) => ifAuth(UserProductsScreen()),
+              OrderScreen.routeName: (_) => ifAuth(OrderScreen()),
+              CartScreen.routeName: (_) => ifAuth(CartScreen()),
+              ProductDetailScreen.routeName: (_) =>
+                  ifAuth(ProductDetailScreen()),
+            },
+          );
+        },
       ),
     );
   }
