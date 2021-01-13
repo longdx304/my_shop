@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_shop/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/cart.dart';
@@ -48,7 +49,17 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer<Auth>(
         builder: (context, auth, child) {
-          ifAuth(targetScreen) => auth.isAuth ? targetScreen : AuthScreen();
+          ifAuth(targetScreen) => auth.isAuth
+              ? targetScreen
+              : FutureBuilder(
+                  future: auth.tryLogIn(),
+                  builder: (context, snapshot) =>
+                      snapshot.connectionState == ConnectionState.waiting
+                          ? Center(
+                              child: SplashScreen(),
+                            )
+                          : AuthScreen(),
+                );
 
           return MaterialApp(
             title: 'My Shop',
